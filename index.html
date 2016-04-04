@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Platform Game</title>
+		<link rel='stylesheet' type='text/css' href='index.css'>
+	</head>
+
+	<body onload ='startGame()'>
+
+		<h1>Title</h1>
+
+		<div id='canvasWrap'></div>
+
+		<!-- create canvas -->
+		<!-- <canvas id='myCanvas' width='800' height='400'></canvas> -->
+		<script src='index.js'></script>
+		<script>
+			window.addEventListener('keydown',function(e){
+				keys[e.keyCode] = true;
+				moveCharacter();
+			});
+			window.addEventListener('keyup',function(e){
+				keys[e.keyCode] = false;
+				stopCharacter();
+			});
+			
+		</script>
+
+		
+		
+
+	</body>
+
+</html>
+
+
+
+
+
+
+
