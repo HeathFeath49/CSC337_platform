@@ -85,7 +85,7 @@ function moveCharacter(){
 	if(keys[32]){
 		if(this.myGamePiece.jumping === false && this.myGamePiece.y === ground){
 			this.myGamePiece.jumping = true;
-			this.myGamePiece.speedY -= speed*3;
+			this.myGamePiece.speedY -= speed*2;
 		}
 	}
 	//'A'
