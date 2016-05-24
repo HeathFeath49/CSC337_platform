@@ -11,7 +11,7 @@ var keys = [];
 
 function startGame(){
 	gameArea.start();
-	myGamePiece = new gamePiece(30,30,10,120,'red');
+	myGamePiece = new gamePiece(30,30,380,120,'red');
 	myObstacle = new obstacle(60,50,280,120,'green');
 }
 
@@ -114,11 +114,21 @@ function obstacle(width,height,x,y,color){
 		ground: gameArea.canvas.height - this.height
 	}
 
-	this.collisionDetection = function(){
+	this.collisionDetection = function(player){
 		//check ground collision
 		if(this.y > this.bounds.ground){
 			this.y = this.bounds.ground;
 		}
+		var j = player.x + player.width;
+		//check for player collision of obstacle's left wall
+		if(j > this.x && j < this.x+this.width && player.y > this.y){
+			player.x = this.x - player.width;
+		}
+		//check for player collision of obstacle's right wall
+		if(player.x < (this.x + this.width)){
+			player.x = this.x + this.width;
+		}
+
 	}
 	///////REPEATED CODE FROM PLAYER CLASS! CLEAN UP LATER!///////
 	this.update = function(){
@@ -126,21 +136,23 @@ function obstacle(width,height,x,y,color){
 		ctx.fillStyle = color;
 		ctx.fillRect(this.x,this.y,this.width,this.height);
 	}
-	this.newPos = function(){
+	this.newPos = function(player){
 		this.gravitySpeed += this.gravity;
 		this.x += this.speedX;
 		this.y += this.speedY + this.gravitySpeed;
-		this.collisionDetection();
+		this.collisionDetection(player);
 	}
 }
 
 
 function updateGame(){
 	gameArea.clear();
+	//player updates
 	myGamePiece.newPos ();
 	myGamePiece.update();
 	myGamePiece.checkInput();
-	myObstacle.newPos();
+	//obstacle updates
+	myObstacle.newPos(myGamePiece);
 	myObstacle.update();
 }
 
