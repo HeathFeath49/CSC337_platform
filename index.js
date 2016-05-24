@@ -11,7 +11,8 @@ var keys = [];
 
 function startGame(){
 	gameArea.start();
-	myGamePiece = new gamePiece(30,30,'red',10,120);
+	myGamePiece = new gamePiece(30,30,10,120,'red');
+	myObstacle = new obstacle(60,50,280,120,'green');
 }
 
 var gameArea = {
@@ -29,7 +30,8 @@ var gameArea = {
 
 }
 
-function gamePiece(width,height,color,x,y){
+///PLAYER CLASS////
+function gamePiece(width,height,x,y,color){
 	this.width = width;
 	this.height = height;
 	this.x = x;
@@ -39,13 +41,13 @@ function gamePiece(width,height,color,x,y){
 	this.speedX = 0;
 	this.speedY = 0;
 	this.jumping = false;
-
+	//boundaries
 	this.bounds = {
 		ground: gameArea.canvas.height - this.height,
 		leftWall: 0,
-		rightWall: gameArea.canvas.width
+		rightWall: gameArea.canvas.width - this.width
 	}
-
+	//input buttons
 	this.btnToMoveLeft = 65; //Key: A
 	this.btnToMoveRight = 68; //Key: D
 	this.btnToJump = 32; //Key: SPACE
@@ -69,7 +71,6 @@ function gamePiece(width,height,color,x,y){
 			this.jumping = true;
 		}
 	}
-	
 	this.update = function(){
 		ctx = gameArea.context;
 		ctx.fillStyle = color;
@@ -81,6 +82,7 @@ function gamePiece(width,height,color,x,y){
 		this.y += this.speedY + this.gravitySpeed;
 		this.collisionDetection();
 	}
+	//////////////CLEAN UP REPEATED CODE!////////////////////////
 	//CD stands for collision detection
 	this.collisionDetection = function(){
 		//check ground collision
@@ -98,17 +100,51 @@ function gamePiece(width,height,color,x,y){
 	}
 }
 
+//OBSTACLE CLASS//
+function obstacle(width,height,x,y,color){
+	this.width = width;
+	this.height = height;
+	this.x = x;
+	this.y = y;
+	this.gravity = 0.05;
+	this.gravitySpeed = 0;
+	this.speedX = 0;
+	this.speedY = 0;
+	this.bounds = {
+		ground: gameArea.canvas.height - this.height
+	}
+
+	this.collisionDetection = function(){
+		//check ground collision
+		if(this.y > this.bounds.ground){
+			this.y = this.bounds.ground;
+		}
+	}
+	///////REPEATED CODE FROM PLAYER CLASS! CLEAN UP LATER!///////
+	this.update = function(){
+		ctx = gameArea.context;
+		ctx.fillStyle = color;
+		ctx.fillRect(this.x,this.y,this.width,this.height);
+	}
+	this.newPos = function(){
+		this.gravitySpeed += this.gravity;
+		this.x += this.speedX;
+		this.y += this.speedY + this.gravitySpeed;
+		this.collisionDetection();
+	}
+}
+
 
 function updateGame(){
 	gameArea.clear();
 	myGamePiece.newPos ();
 	myGamePiece.update();
 	myGamePiece.checkInput();
-
+	myObstacle.newPos();
+	myObstacle.update();
 }
 
 function stopCharacter(e){
-	//console.log(e.keycode);
 	this.myGamePiece.speedX = 0
 	this.myGamePiece.speedY = 0;
 	this.myGamePiece.gravitySpeed = 2;
