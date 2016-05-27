@@ -9,7 +9,7 @@ var gravity = 0.1;
 var speedLimit = 3;
 var friction = 0.8;
 var delta = 1/30;
-var initialJumpForce = 5;
+var initialJumpForce = 9;
 var keys = [];
 ////////////////////
 
@@ -43,6 +43,7 @@ function gamePiece(width,height,x,y,color){
 	this.gravitySpeed = 0;
 	this.speedX = 0;
 	this.speedY = 0;
+	this.canJump = false;
 	this.isJumping = false;
 	this.jumpVelocity = 0;
 	//boundaries
@@ -74,7 +75,9 @@ function gamePiece(width,height,x,y,color){
 		}
 		//button to jump
 		if(keys[this.btnToJump]){
-			while(!(this.isJumping)){
+
+			
+			/*while(!(this.isJumping)){
 				this.isJumping = true;
 				this.jumpVelocity = initialJumpForce;
 				this.speedY -= this.jumpVelocity;
@@ -82,7 +85,7 @@ function gamePiece(width,height,x,y,color){
 				if(this.jumpVelocity <= 0){
 					this.isJumping = false;
 				}
-			}
+			}*/
 		}
 		
 		ctx = gameArea.context;
@@ -137,13 +140,52 @@ function obstacle(width,height,x,y,color){
 		var j = player.x + player.width;
 		var i = this.x + this.width;
 		//check for player collision of obstacle's left wall
-		if(j > this.x && j < this.x+this.width && player.y+player.height > this.y){
-			player.x = this.x - player.width;
+		if(j > this.x && player.x < this.x){
+			if(player.y+player.height > this.y){
+				player.x = this.x - player.width;
+			}
+			else{
+				player.y = this.y-this.height;
+				this.canJump = true;
+				gravity = 0;
+			}
 		}
+		//right wall
+		if(player.x < i && player.x > this.x){
+			if(player.y+player.height > this.y){
+				player.x = i;
+			}
+			else{
+				player.y = this.y-this.height;
+				this.canJump = true;
+				gravity = 0;
+			}
+		}
+		
+
+	/*	if((player.x >= this.x && player.x <= this.x+this.width)||(player.x+player.width > this.x && player.x+player.width< this.x+this.width)){
+			
+			if(player.y+player.height > this.y){
+
+				console.log('hello');
+			}
+		}*/
+
+
+
 		//check for player collision of obstacle's right wall
-		if(player.x < i && player.x > this.x && player.y+player.height > this.y){
+		/*if(player.x < i && player.x > this.x && player.y+player.height > this.y){
 			player.x = this.x + this.width;
-		}
+		}*/
+		
+		//check for collision of top of obstacle
+		//if(player.y+player.height < this.y && player.y+player.height > this.y-1){
+			//if((player.x >= this.x && player.x <= this.x+this.width)||(player.x+player.width > this.x && player.x+player.width< this.x+this.width)){
+				/*player.y = this.y-this.height;*/
+				//console.log('top collision!');
+			//}
+		//}
+
 
 	}
 	///////REPEATED CODE FROM PLAYER CLASS! CLEAN UP LATER!///////
