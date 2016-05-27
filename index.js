@@ -4,14 +4,18 @@
 
 //global variables//
 var myGamePiece;
+var netforce;
+var gravity = 0.1;
 var speedLimit = 3;
 var friction = 0.8;
+var delta = 1/30;
+var initialJumpForce = 5;
 var keys = [];
 ////////////////////
 
 function startGame(){
 	gameArea.start();
-	myGamePiece = new gamePiece(30,30,380,120,'red');
+	myGamePiece = new gamePiece(30,30,100,80,'red');
 	myObstacle = new obstacle(60,50,280,120,'green');
 }
 
@@ -36,11 +40,11 @@ function gamePiece(width,height,x,y,color){
 	this.height = height;
 	this.x = x;
 	this.y = y;
-	this.gravity = 0.05;
 	this.gravitySpeed = 0;
 	this.speedX = 0;
 	this.speedY = 0;
-	this.jumping = false;
+	this.isJumping = false;
+	this.jumpVelocity = 0;
 	//boundaries
 	this.bounds = {
 		ground: gameArea.canvas.height - this.height,
@@ -53,7 +57,9 @@ function gamePiece(width,height,x,y,color){
 	this.btnToJump = 32; //Key: SPACE
 	
 	/////METHODS////
-	this.checkInput = function(){
+	
+	
+	this.update = function(){
 		//button to move left
 		if(keys[this.btnToMoveLeft]){
 			if(this.speedX > -speedLimit){
@@ -68,16 +74,25 @@ function gamePiece(width,height,x,y,color){
 		}
 		//button to jump
 		if(keys[this.btnToJump]){
-			this.jumping = true;
+			while(!(this.isJumping)){
+				this.isJumping = true;
+				this.jumpVelocity = initialJumpForce;
+				this.speedY -= this.jumpVelocity;
+				this.jumpVelocity -= gravity;
+				if(this.jumpVelocity <= 0){
+					this.isJumping = false;
+				}
+			}
 		}
-	}
-	this.update = function(){
+		
 		ctx = gameArea.context;
 		ctx.fillStyle = color;
 		ctx.fillRect(this.x,this.y,this.width,this.height);
+		
 	}
+	
 	this.newPos = function(){
-		this.gravitySpeed += this.gravity;
+		this.gravitySpeed += gravity;
 		this.x += this.speedX;
 		this.y += this.speedY + this.gravitySpeed;
 		this.collisionDetection();
@@ -88,6 +103,7 @@ function gamePiece(width,height,x,y,color){
 		//check ground collision
 		if(this.y > this.bounds.ground){
 			this.y = this.bounds.ground;
+			this.isJumping = false;
 		}
 		//check left wall collision 
 		if(this.x < this.bounds.leftWall){
@@ -106,7 +122,6 @@ function obstacle(width,height,x,y,color){
 	this.height = height;
 	this.x = x;
 	this.y = y;
-	this.gravity = 0.05;
 	this.gravitySpeed = 0;
 	this.speedX = 0;
 	this.speedY = 0;
@@ -120,12 +135,13 @@ function obstacle(width,height,x,y,color){
 			this.y = this.bounds.ground;
 		}
 		var j = player.x + player.width;
+		var i = this.x + this.width;
 		//check for player collision of obstacle's left wall
-		if(j > this.x && j < this.x+this.width && player.y > this.y){
+		if(j > this.x && j < this.x+this.width && player.y+player.height > this.y){
 			player.x = this.x - player.width;
 		}
 		//check for player collision of obstacle's right wall
-		if(player.x < (this.x + this.width)){
+		if(player.x < i && player.x > this.x && player.y+player.height > this.y){
 			player.x = this.x + this.width;
 		}
 
@@ -137,7 +153,7 @@ function obstacle(width,height,x,y,color){
 		ctx.fillRect(this.x,this.y,this.width,this.height);
 	}
 	this.newPos = function(player){
-		this.gravitySpeed += this.gravity;
+		this.gravitySpeed += gravity;
 		this.x += this.speedX;
 		this.y += this.speedY + this.gravitySpeed;
 		this.collisionDetection(player);
@@ -148,9 +164,8 @@ function obstacle(width,height,x,y,color){
 function updateGame(){
 	gameArea.clear();
 	//player updates
-	myGamePiece.newPos ();
+	myGamePiece.newPos();
 	myGamePiece.update();
-	myGamePiece.checkInput();
 	//obstacle updates
 	myObstacle.newPos(myGamePiece);
 	myObstacle.update();
