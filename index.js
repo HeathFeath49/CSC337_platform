@@ -158,24 +158,24 @@ function obstacle(width,height,x,y,color){
 		var i = this.x + this.width;
 		//check for player collision of obstacle's left wall
 		if(j > this.x && player.x < this.x){
-			if(player.y+player.height > this.y){
+			if(player.y+player.height-gravity > this.y){
 				player.x = this.x - player.width;
 			}
 			else{
-				player.y = this.y-this.height;
-				this.canJump = true;
-				gravity = 0;
+				player.y = this.y-player.height-gravity;
+				//this.canJump = true;
+				player.speedY = -player.gravitySpeed;
 			}
 		}
 		//right wall
 		if(player.x < i && player.x > this.x){
-			if(player.y+player.height > this.y){
+			if(player.y+player.height-gravity > this.y){
 				player.x = i;
 			}
 			else{
-				player.y = this.y-this.height;
-				this.canJump = true;
-				gravity = 0;
+				player.y = this.y-player.height-gravity;
+				//this.canJump = true;
+				player.speedY = -player.gravitySpeed;
 			}
 		}
 		
@@ -230,11 +230,12 @@ function updateGame(){
 	myObstacle.update();
 }
 
+//////Using for now but will be changed to fix jumping mechanics/////
 function stopCharacter(e){
 	this.myGamePiece.speedX = 0
 	this.myGamePiece.speedY = 0;
-	this.myGamePiece.gravitySpeed = 2;
-	this.myGamePiece.jumping = false;
+	this.myGamePiece.gravitySpeed = 0;
+	this.myGamePiece.isJumping = false;
 }
 
 
