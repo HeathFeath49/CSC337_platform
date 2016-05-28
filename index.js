@@ -5,11 +5,11 @@
 //global variables//
 var myGamePiece;
 var netforce;
-var gravity = 0.1;
+var gravity = 0.2;
 var speedLimit = 3;
 var friction = 0.8;
 var delta = 1/30;
-var initialJumpForce = 9;
+var initialJumpForce = 12;
 var keys = [];
 ////////////////////
 
@@ -76,7 +76,7 @@ function gamePiece(width,height,x,y,color){
 		//button to jump
 		if(keys[this.btnToJump]){
 
-			
+			this.jump();		
 			/*while(!(this.isJumping)){
 				this.isJumping = true;
 				this.jumpVelocity = initialJumpForce;
@@ -87,11 +87,27 @@ function gamePiece(width,height,x,y,color){
 				}
 			}*/
 		}
+		if(this.isJumping){
+			this.canJump = false;
+			this.speedY = this.jumpVelocity*-1;
+			this.jumpVelocity -= gravity;
+
+			if(this.jumpVelocity <= 0){
+				this.isJumping = false;
+			}
+		}
 		
 		ctx = gameArea.context;
 		ctx.fillStyle = color;
 		ctx.fillRect(this.x,this.y,this.width,this.height);
 		
+	}
+
+	this.jump = function(){
+		if(this.canJump){
+			this.jumpVelocity = initialJumpForce;
+			this.isJumping = true;
+		}
 	}
 	
 	this.newPos = function(){
@@ -106,6 +122,7 @@ function gamePiece(width,height,x,y,color){
 		//check ground collision
 		if(this.y > this.bounds.ground){
 			this.y = this.bounds.ground;
+			this.canJump = true;
 			this.isJumping = false;
 		}
 		//check left wall collision 
